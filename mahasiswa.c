@@ -9,8 +9,10 @@
 #define MAX_KELAS_LENGTH 9
 #define MAX_EMAIL_LENGTH 49
 #define MAX_GENDER_LENGTH 9
+#define MAX_MATKUL_LENGTH 49
+#define MAX_TAHUN_AKADEMIK_LENGTH 9
 
-// Define structures for student profile and account
+// Define structures for student profile, account, academic records, courses, and grades
 typedef struct {
     int id;
     char NIM[MAX_NIM_LENGTH + 1];
@@ -19,6 +21,7 @@ typedef struct {
     char email[MAX_EMAIL_LENGTH + 1];
     char gender[MAX_GENDER_LENGTH + 1];
     int semester;
+    float IP;
 } Mahasiswa;
 
 typedef struct {
@@ -26,11 +29,49 @@ typedef struct {
     char password[MAX_PASSWORD_LENGTH + 1];
 } AkunMahasiswa;
 
-// Global variables to store student and account data
+typedef struct {
+    int id;
+    char matakuliah[MAX_MATKUL_LENGTH + 1];
+    int sks;
+} Matakuliah;
+
+typedef struct {
+    int id;
+    char NIM[MAX_NIM_LENGTH + 1];
+    int semester;
+    char matakuliah[MAX_MATKUL_LENGTH + 1];
+    char tahunAkademik[MAX_TAHUN_AKADEMIK_LENGTH + 1];
+    float nilaiTugas;
+    float nilaiUTS;
+    float nilaiUAS;
+    char grade;
+} Akademik;
+
+// Global variables to store data
 Mahasiswa *mahasiswaData = NULL;
 AkunMahasiswa *akunMahasiswaData = NULL;
+Akademik *akademikData = NULL;
+Matakuliah *matakuliahData = NULL;
 int mahasiswaCount = 0;
 int akunCount = 0;
+int akademikCount = 0;
+int matakuliahCount = 0;
+
+// Function prototypes
+bool checkNIM(const char NIM[]);
+bool checkLogin(const char NIM[], const char password[]);
+void addMahasiswa(const char NIM[], const char nama[], const char kelas[], const char email[], const char gender[], int semester);
+void addAkunMahasiswa(const char NIM[], const char password[]);
+void addAkademik(const char NIM[], int semester, const char matakuliah[], const char tahunAkademik[], float nilaiTugas, float nilaiUTS, float nilaiUAS);
+void addMatakuliah(const char matakuliah[], int sks);
+void registerMahasiswa();
+void login();
+void checkProfile(const char NIM[]);
+void displayAkademik(const char NIM[]);
+float calculateIP(const char NIM[], int semester);
+float calculateIPK(const char NIM[]);
+char calculateGrade(float finalGrade);
+void populateSampleData();
 
 // Function to check if NIM is registered
 bool checkNIM(const char NIM[]) {
@@ -66,7 +107,52 @@ void addMahasiswa(const char NIM[], const char nama[], const char kelas[], const
     strncpy(mahasiswaData[mahasiswaCount].email, email, MAX_EMAIL_LENGTH);
     strncpy(mahasiswaData[mahasiswaCount].gender, gender, MAX_GENDER_LENGTH);
     mahasiswaData[mahasiswaCount].semester = semester;
+    mahasiswaData[mahasiswaCount].IP = 0; // Initialize IP
     mahasiswaCount++;
+}
+
+// Function to add a new student account
+void addAkunMahasiswa(const char NIM[], const char password[]) {
+    akunMahasiswaData = realloc(akunMahasiswaData, (akunCount + 1) * sizeof(AkunMahasiswa));
+    if (akunMahasiswaData == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(akunMahasiswaData[akunCount].NIM, NIM, MAX_NIM_LENGTH);
+    strncpy(akunMahasiswaData[akunCount].password, password, MAX_PASSWORD_LENGTH);
+    akunCount++;
+}
+
+// Function to add academic records
+void addAkademik(const char NIM[], int semester, const char matakuliah[], const char tahunAkademik[], float nilaiTugas, float nilaiUTS, float nilaiUAS) {
+    akademikData = realloc(akademikData, (akademikCount + 1) * sizeof(Akademik));
+    if (akademikData == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    akademikData[akademikCount].id = akademikCount + 1;
+    strncpy(akademikData[akademikCount].NIM, NIM, MAX_NIM_LENGTH);
+    akademikData[akademikCount].semester = semester;
+    strncpy(akademikData[akademikCount].matakuliah, matakuliah, MAX_MATKUL_LENGTH);
+    strncpy(akademikData[akademikCount].tahunAkademik, tahunAkademik, MAX_TAHUN_AKADEMIK_LENGTH);
+    akademikData[akademikCount].nilaiTugas = nilaiTugas;
+    akademikData[akademikCount].nilaiUTS = nilaiUTS;
+    akademikData[akademikCount].nilaiUAS = nilaiUAS;
+    akademikData[akademikCount].grade = calculateGrade((nilaiTugas + nilaiUTS + nilaiUAS) / 3); // Calculate and set grade
+    akademikCount++;
+}
+
+// Function to add a new course
+void addMatakuliah(const char matakuliah[], int sks) {
+    matakuliahData = realloc(matakuliahData, (matakuliahCount + 1) * sizeof(Matakuliah));
+    if (matakuliahData == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    matakuliahData[matakuliahCount].id = matakuliahCount + 1;
+    strncpy(matakuliahData[matakuliahCount].matakuliah, matakuliah, MAX_MATKUL_LENGTH);
+    matakuliahData[matakuliahCount].sks = sks;
+    matakuliahCount++;
 }
 
 // Function to register a new student
@@ -79,13 +165,13 @@ void registerMahasiswa() {
     char gender[MAX_GENDER_LENGTH + 1];
     int semester;
 
+    // Input student data
     do {
         printf("Masukkan NIM: ");
         fgets(NIM, sizeof(NIM), stdin);
         strtok(NIM, "\n"); // Remove newline character
     } while (strcmp(NIM, "") == 0 || strcmp(NIM, "\n") == 0 || strlen(NIM) > MAX_NIM_LENGTH);
 
-    // Check if NIM is already registered
     if (checkNIM(NIM)) {
         printf("NIM sudah terdaftar.\n");
         return;
@@ -116,91 +202,224 @@ void registerMahasiswa() {
     } while (strcmp(email, "") == 0 || strcmp(email, "\n") == 0 || strlen(email) > MAX_EMAIL_LENGTH);
 
     do {
-        printf("Masukkan Gender: ");
+        printf("Masukkan Gender (L/P): ");
         fgets(gender, sizeof(gender), stdin);
         strtok(gender, "\n"); // Remove newline character
     } while (strcmp(gender, "") == 0 || strcmp(gender, "\n") == 0 || strlen(gender) > MAX_GENDER_LENGTH);
 
-    do {
-        printf("Masukkan Semester: ");
-        scanf("%d", &semester);
-        while (getchar() != '\n'); // Clear buffer
-    } while (semester <= 0);
+    printf("Masukkan Semester: ");
+    scanf("%d", &semester);
+    getchar(); // Consume newline character left in buffer
 
-    // Add new student account
-    akunMahasiswaData = realloc(akunMahasiswaData, (akunCount + 1) * sizeof(AkunMahasiswa));
-    if (akunMahasiswaData == NULL) {
-        fprintf(stderr, "Memory allocation failed.\n");
-        exit(EXIT_FAILURE);
-    }
-    strncpy(akunMahasiswaData[akunCount].NIM, NIM, MAX_NIM_LENGTH);
-    strncpy(akunMahasiswaData[akunCount].password, password, MAX_PASSWORD_LENGTH);
-    akunCount++;
-
-    // Add student data
+    // Add student account and profile
+    addAkunMahasiswa(NIM, password);
     addMahasiswa(NIM, nama, kelas, email, gender, semester);
-
-    printf("Registrasi berhasil!\n");
+    printf("Registrasi berhasil.\n");
 }
 
-// Function for student login
+// Function to log in
 void login() {
-    char inputNIM[MAX_NIM_LENGTH + 1];
-    char inputPassword[MAX_PASSWORD_LENGTH + 1];
+    char NIM[MAX_NIM_LENGTH + 1];
+    char password[MAX_PASSWORD_LENGTH + 1];
 
     printf("Masukkan NIM: ");
-    fgets(inputNIM, sizeof(inputNIM), stdin);
-    strtok(inputNIM, "\n"); // Remove newline character
+    fgets(NIM, sizeof(NIM), stdin);
+    strtok(NIM, "\n"); // Remove newline character
 
-    // Check if NIM is registered
-    if (!checkNIM(inputNIM)) {
+    if (!checkNIM(NIM)) {
         printf("NIM tidak terdaftar.\n");
         return;
     }
 
     printf("Masukkan Password: ");
-    fgets(inputPassword, sizeof(inputPassword), stdin);
-    strtok(inputPassword, "\n"); // Remove newline character
+    fgets(password, sizeof(password), stdin);
+    strtok(password, "\n"); // Remove newline character
 
-    // Check if login is successful
-    if (checkLogin(inputNIM, inputPassword)) {
-        printf("Login berhasil!\n");
+    if (checkLogin(NIM, password)) {
+        printf("Login berhasil.\n");
+        int choice;
+        do {
+            printf("\nMenu:\n1. Check Profile\n2. Display Academic Records\n3. Logout\n");
+            printf("Masukkan pilihan: ");
+            scanf("%d", &choice);
+            getchar(); // Consume newline character left in buffer
+
+            switch (choice) {
+                case 1:
+                    checkProfile(NIM);
+                    break;
+                case 2:
+                    displayAkademik(NIM);
+                    break;
+                case 3:
+                    printf("Logout berhasil.\n");
+                    break;
+                default:
+                    printf("Pilihan tidak valid.\n");
+                    break;
+            }
+        } while (choice != 3);
     } else {
-        printf("Password salah.\n");
+        printf("Login gagal. NIM atau password salah.\n");
     }
 }
 
-int main() {
-    // Main menu
-    int pilihan;
-    do {
-        printf("\nMenu:\n");
-        printf("1. Login\n");
-        printf("2. Register\n");
-        printf("3. Keluar\n");
-        printf("Pilihan: ");
-        scanf("%d", &pilihan);
-        while (getchar() != '\n'); // Clear buffer
+// Function to check profile
+void checkProfile(const char NIM[]) {
+    for (int i = 0; i < mahasiswaCount; i++) {
+        if (strcmp(mahasiswaData[i].NIM, NIM) == 0) {
+            printf("Profil Mahasiswa:\n");
+            printf("NIM: %s\n", mahasiswaData[i].NIM);
+            printf("Nama: %s\n", mahasiswaData[i].nama);
+            printf("Kelas: %s\n", mahasiswaData[i].kelas);
+            printf("Email: %s\n", mahasiswaData[i].email);
+            printf("Gender: %s\n", mahasiswaData[i].gender);
+            printf("Semester: %d\n", mahasiswaData[i].semester);
+         
+            return;
+        }
+    }
+    printf("Profil tidak ditemukan.\n");
+}
 
-        switch (pilihan) {
+// Function to display academic records
+void displayAkademik(const char NIM[]) {
+    printf("Rekam Akademik:\n");
+    int currentSemester = -1;
+    float totalSKS = 0, totalNilai = 0;
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0) {
+            if (currentSemester != akademikData[i].semester) {
+                if (currentSemester != -1) {
+                    float semesterIP = totalNilai / totalSKS;
+                    printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
+                }
+                currentSemester = akademikData[i].semester;
+                totalSKS = 0;
+                totalNilai = 0;
+            }
+            printf("Semester: %d\n", akademikData[i].semester);
+            printf("Matakuliah: %s\n", akademikData[i].matakuliah);
+            printf("Tahun Akademik: %s\n", akademikData[i].tahunAkademik);
+            printf("Nilai Tugas: %.2f\n", akademikData[i].nilaiTugas);
+            printf("Nilai UTS: %.2f\n", akademikData[i].nilaiUTS);
+            printf("Nilai UAS: %.2f\n", akademikData[i].nilaiUAS);
+
+            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
+            printf("Nilai rata-rata sebelum grade: %.2f (Grade: %c)\n", finalGrade, akademikData[i].grade);
+
+            totalSKS += getSKS(akademikData[i].matakuliah);
+            totalNilai += (finalGrade * getSKS(akademikData[i].matakuliah));
+        }
+    }
+    if (currentSemester != -1) {
+        float semesterIP = totalNilai / totalSKS;
+        printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
+    }
+    // Display IPK (Cumulative GPA)
+    float IPK = calculateIPK(NIM);
+    printf("IPK: %.2f\n", IPK > 4.0 ? 4.0 : IPK);
+}
+
+
+// Function to calculate IP (GPA for a semester)
+float calculateIP(const char NIM[], int semester) {
+    int totalSKS = 0;
+    float totalNilai = 0;
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0 && akademikData[i].semester == semester) {
+            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
+            totalNilai += finalGrade * getSKS(akademikData[i].matakuliah);
+            totalSKS += getSKS(akademikData[i].matakuliah);
+        }
+    }
+    if (totalSKS == 0) return 0;
+    return totalNilai / totalSKS;
+}
+
+// Function to calculate IPK (Cumulative GPA)
+float calculateIPK(const char NIM[]) {
+    int totalSKS = 0;
+    float totalNilai = 0;
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0) {
+            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
+            totalSKS += getSKS(akademikData[i].matakuliah);
+            totalNilai += finalGrade * getSKS(akademikData[i].matakuliah);
+        }
+    }
+    if (totalSKS == 0) return 0;
+    return totalNilai / totalSKS;
+}
+
+// Function to calculate grade based on final grade
+char calculateGrade(float finalGrade) {
+    if (finalGrade >= 85) return 'A';
+    if (finalGrade >= 70) return 'B';
+    if (finalGrade >= 55) return 'C';
+    if (finalGrade >= 40) return 'D';
+    return 'E';
+}
+
+// Function to get SKS of a course
+int getSKS(const char matakuliah[]) {
+    for (int i = 0; i < matakuliahCount; i++) {
+        if (strcmp(matakuliahData[i].matakuliah, matakuliah) == 0) {
+            return matakuliahData[i].sks;
+        }
+    }
+    return 0;
+}
+
+// Function to populate sample data for testing
+void populateSampleData() {
+    // Add sample students and their accounts
+    addMahasiswa("2350081084", "Alice", "A1", "alice@example.com", "L", 1);
+    addAkunMahasiswa("2350081084", "password123");
+    addMahasiswa("23456789012345", "Bob", "A2", "bob@example.com", "P", 2);
+    addAkunMahasiswa("23456789012345", "password234");
+
+    // Add sample courses
+    addMatakuliah("Mathematics", 3);
+    addMatakuliah("Physics", 4);
+
+    // Add sample academic records
+    addAkademik("2350081084", 1, "Mathematics", "2023/2024", 80, 75, 85);
+    addAkademik("2350081084", 1, "Physics", "2023/2024", 70, 65, 75);
+    addAkademik("2350081084", 2, "Mathematics", "2023/2024", 90, 85, 95);
+}
+
+int main() {
+    populateSampleData();
+
+    int choice;
+    do {
+        printf("Menu Utama:\n1. Registrasi Mahasiswa\n2. Login\n3. Keluar\n");
+        printf("Masukkan pilihan: ");
+        scanf("%d", &choice);
+        getchar(); // Consume newline character left in buffer
+
+        switch (choice) {
             case 1:
-                login(); // Call login function
+                registerMahasiswa();
                 break;
             case 2:
-                registerMahasiswa(); // Call register function
+                login();
                 break;
             case 3:
-                printf("Keluar.\n");
+                printf("Terima kasih telah menggunakan sistem ini.\n");
                 break;
             default:
                 printf("Pilihan tidak valid.\n");
                 break;
         }
-    } while (pilihan != 3);
+    } while (choice != 3);
 
-    // Cleanup memory
+    // Free allocated memory
     free(mahasiswaData);
     free(akunMahasiswaData);
+    free(akademikData);
+    free(matakuliahData);
 
     return 0;
 }
