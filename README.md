@@ -5,7 +5,7 @@ The Student Management System is a project aimed at assisting in managing studen
 
 ## Flowchart
 
-![Flowchart]([flow_ongoing.png](https://github.com/collegeid/intellecta_uni_markmap/blob/main/flow_ongoing.png))
+![Flowchart](https://github.com/collegeid/intellecta_uni_markmap/blob/main/flow_ongoing.png)
 
 To view the system's flowchart in detail, please [Preview Here](https://cacoo.com/diagrams/aoZuYT59UtRwv4Go/97711).
 
