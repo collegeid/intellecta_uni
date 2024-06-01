@@ -13,6 +13,36 @@ void addNilaiAdmin();
 void editNilaiAdmin();
 void viewNilaiAdmin();
 
+
+
+// Fungsi untuk login admin
+void loginAdmin() {
+    char username[50];
+    char password[50];
+    bool loggedIn = false;
+
+    // Lakukan perulangan do-while hingga login berhasil
+    do {
+        printf("Masukkan username admin: ");
+        fgets(username, sizeof(username), stdin);
+        strtok(username, "\n");  // Hapus karakter newline
+
+        printf("Masukkan password admin: ");
+        fgets(password, sizeof(password), stdin);
+        strtok(password, "\n");  // Hapus karakter newline
+
+        // Periksa apakah username dan password benar
+        if (strcmp(username, "admin") == 0 && strcmp(password, "admin123") == 0) {
+            loggedIn = true;
+            main_admin();
+        } else {
+            printf("Login gagal. Username atau password salah.\n");
+        }
+    } while (!loggedIn);
+}
+
+
+
 void adminMenu() {
     int choice;
     do {

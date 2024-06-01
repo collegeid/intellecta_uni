@@ -3,6 +3,7 @@
 #include <string.h>
 #include "admin.c"
 
+void loginAdmin();
 
 int main() {
     int role = 1;
@@ -12,12 +13,12 @@ int main() {
     printf("2. Admin\n");
     printf("Pilihan: ");
     scanf("%d", &role);
-    getchar(); 
+    getchar();
 
     if (role == 1) {
        main_mahasiswa();
     } else if (role == 2) {
-         main_admin();
+       loginAdmin();
     } else {
         printf("Pilihan tidak valid.\n");
     }
