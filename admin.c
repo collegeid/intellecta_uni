@@ -635,7 +635,23 @@ void deleteMatakuliahAdmin() {
 }
 
 
+void checkIPIPKMahasiswa() {
 
+   char NIM[MAX_NIM_LENGTH + 1];
+    char password[MAX_PASSWORD_LENGTH + 1];
+
+    printf("Masukkan NIM: ");
+    fgets(NIM, sizeof(NIM), stdin);
+    strtok(NIM, "\n"); // Remove newline character
+
+    if (!checkNIM(NIM)) {
+        printf("NIM tidak terdaftar.\n");
+        return;
+    } else {
+    displayAkademik(NIM);
+    }
+
+}
 
 
 
@@ -658,7 +674,7 @@ int main_admin() {
                 break;
             case 2:
                 do {
-                    printf("Manajemen Akademik:\n1. Tambah Nilai\n2. Edit Nilai\n3. Lihat Nilai\n4. Delete Nilai Akademik\n5. Kembali ke Menu Utama\n");
+                    printf("Manajemen Akademik:\n1. Tambah Nilai\n2. Edit Nilai\n3. Lihat Nilai\n4. Delete Nilai Akademik\n5. Check IP & IPK Mahasiswa\n6. Kembali ke Menu Utama\n");
                     printf("Masukkan pilihan: ");
                     scanf("%d", &choice);
                     getchar();  // Consume newline character left in buffer
@@ -677,12 +693,15 @@ int main_admin() {
                             deleteNilaiAdmin();
                             break;
                         case 5:
+                           checkIPIPKMahasiswa();
+                            break;
+                        case 6:
                             break;  // Keluar dari loop
                         default:
                             printf("Pilihan tidak valid.\n");
                             break;
                     }
-                } while (choice != 5);
+                } while (choice != 6);
                 break;
             case 3:
                 do {
