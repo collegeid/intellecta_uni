@@ -389,7 +389,7 @@ void populateSampleData() {
     addAkademik("2350081084", 2, "Mathematics", "2023/2024", 90, 85, 95);
 }
 
-int main() {
+int main_mahasiswa() {
     populateSampleData();
 
     int choice;
