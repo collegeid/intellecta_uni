@@ -16,7 +16,7 @@ void viewNilaiAdmin();
 void adminMenu() {
     int choice;
     do {
-        printf("Manajemen Akun:\n1. Tambah Akun Mahasiswa\n2. Edit Akun Mahasiswa\n3. Hapus Akun Mahasiswa\n4. Lihat Data Mahasiswa\n5. Kembali\n");
+        printf("Manajemen Akun:\n1. Tambah Akun Mahasiswa\n2. Edit Akun Mahasiswa\n3. Lihat Data Mahasiswa\n4. Hapus Akun Mahasiswa\n5. Kembali\n");
         printf("Masukkan pilihan: ");
         scanf("%d", &choice);
         getchar();  // Consume newline character left in buffer
@@ -29,10 +29,10 @@ void adminMenu() {
                 editMahasiswaAdmin();
                 break;
             case 3:
-                deleteMahasiswaAdmin();
+               viewMahasiswaAdmin();
                 break;
             case 4:
-                viewMahasiswaAdmin();
+                deleteMahasiswaAdmin();
                 break;
             case 5:
                 return;
@@ -199,6 +199,14 @@ void viewMahasiswaAdmin() {
     }
 }
 
+
+void displayMatakuliah() {
+    printf("Daftar Mata Kuliah:\n");
+    for (int i = 0; i < matakuliahCount; i++) {
+        printf("%d. %s (%d SKS)\n", matakuliahData[i].id, matakuliahData[i].matakuliah, matakuliahData[i].sks);
+    }
+}
+
 void addNilaiAdmin() {
     char NIM[MAX_NIM_LENGTH + 1];
     char matakuliah[MAX_MATKUL_LENGTH + 1];
@@ -213,13 +221,15 @@ void addNilaiAdmin() {
     if (!checkNIM(NIM)) {
         printf("NIM tidak terdaftar.\n");
         return;
-    }
+    } else {
+  // Display the list of courses
+    displayMatakuliah();
 
-    printf("Masukkan Mata Kuliah: ");
+    printf("Masukkan Mata Kuliah(eg: Strukdat): ");
     fgets(matakuliah, sizeof(matakuliah), stdin);
     strtok(matakuliah, "\n");  // Remove newline character
 
-    printf("Masukkan Tahun Akademik: ");
+    printf("Masukkan Tahun Akademik(eg: 2023/2024): ");
     fgets(tahunAkademik, sizeof(tahunAkademik), stdin);
     strtok(tahunAkademik, "\n");  // Remove newline character
 
@@ -239,8 +249,9 @@ void addNilaiAdmin() {
     scanf("%f", &nilaiUAS);
     getchar();  // Consume newline character left in buffer
 
-    addNilaiAdmin(NIM, matakuliah, tahunAkademik, semester, nilaiTugas, nilaiUTS, nilaiUAS);
+    addAkademik(NIM, semester, matakuliah, tahunAkademik, nilaiTugas, nilaiUTS, nilaiUAS);
     printf("Nilai berhasil ditambahkan.\n");
+    }
 }
 
 void editNilaiAdmin() {
