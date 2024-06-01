@@ -387,7 +387,7 @@ void viewNilaiAdmin() {
 
 
 
-int main() {
+int main_admin() {
     int choice;
     populateSampleData();  // Memasukkan data sampel untuk pengujian
 

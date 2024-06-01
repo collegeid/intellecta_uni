@@ -15,7 +15,7 @@ int main() {
     getchar(); 
 
     if (role == 1) {
-       
+       main_mahasiswa();
     } else if (role == 2) {
          main_admin();
     } else {

@@ -229,7 +229,7 @@ void login() {
     if (!checkNIM(NIM)) {
         printf("NIM tidak terdaftar.\n");
         return;
-    }
+    } else {
 
     printf("Masukkan Password: ");
     fgets(password, sizeof(password), stdin);
@@ -261,6 +261,7 @@ void login() {
         } while (choice != 3);
     } else {
         printf("Login gagal. NIM atau password salah.\n");
+    }
     }
 }
 
