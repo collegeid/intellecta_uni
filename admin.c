@@ -256,7 +256,6 @@ void addNilaiAdmin() {
     printf("Nilai berhasil ditambahkan.\n");
     }
 }
-
 void editNilaiAdmin() {
     char NIM[MAX_NIM_LENGTH + 1];
     char matakuliah[MAX_MATKUL_LENGTH + 1];
@@ -285,18 +284,54 @@ void editNilaiAdmin() {
     scanf("%d", &semester);
     getchar();  // Consume newline character left in buffer
 
-    printf("Masukkan Nilai Tugas: ");
-    scanf("%f", &nilaiTugas);
-    getchar();  // Consume newline character left in buffer
+    // Search for the existing grade
+    float prevNilaiTugas = -1, prevNilaiUTS = -1, prevNilaiUAS = -1;
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0 && strcmp(akademikData[i].matakuliah, matakuliah) == 0 && strcmp(akademikData[i].tahunAkademik, tahunAkademik) == 0 && akademikData[i].semester == semester) {
+            prevNilaiTugas = akademikData[i].nilaiTugas;
+            prevNilaiUTS = akademikData[i].nilaiUTS;
+            prevNilaiUAS = akademikData[i].nilaiUAS;
+            break;
+        }
+    }
 
-    printf("Masukkan Nilai UTS: ");
-    scanf("%f", &nilaiUTS);
-    getchar();  // Consume newline character left in buffer
+    // Display previous grades if found
+    if (prevNilaiTugas >= 0 && prevNilaiUTS >= 0 && prevNilaiUAS >= 0) {
+        printf("Nilai Sebelumnya:\n");
+        printf("Nilai Tugas: %.2f\n", prevNilaiTugas);
+        printf("Nilai UTS: %.2f\n", prevNilaiUTS);
+        printf("Nilai UAS: %.2f\n", prevNilaiUAS);
+    } else {
+        printf("Nilai sebelumnya tidak ditemukan.\n");
+    }
 
-    printf("Masukkan Nilai UAS: ");
-    scanf("%f", &nilaiUAS);
-    getchar();  // Consume newline character left in buffer
+    // Input new grades
+    printf("Masukkan Nilai Tugas (kosongkan jika tidak ingin mengubah): ");
+    char input[10];
+    fgets(input, sizeof(input), stdin);
+    if (strcmp(input, "\n") != 0) {
+        sscanf(input, "%f", &nilaiTugas);
+    } else {
+        nilaiTugas = prevNilaiTugas;  // Use previous value if input is empty
+    }
 
+    printf("Masukkan Nilai UTS (kosongkan jika tidak ingin mengubah): ");
+    fgets(input, sizeof(input), stdin);
+    if (strcmp(input, "\n") != 0) {
+        sscanf(input, "%f", &nilaiUTS);
+    } else {
+        nilaiUTS = prevNilaiUTS;  // Use previous value if input is empty
+    }
+
+    printf("Masukkan Nilai UAS (kosongkan jika tidak ingin mengubah): ");
+    fgets(input, sizeof(input), stdin);
+    if (strcmp(input, "\n") != 0) {
+        sscanf(input, "%f", &nilaiUAS);
+    } else {
+        nilaiUAS = prevNilaiUAS;  // Use previous value if input is empty
+    }
+
+    // Update the grades
     for (int i = 0; i < akademikCount; i++) {
         if (strcmp(akademikData[i].NIM, NIM) == 0 && strcmp(akademikData[i].matakuliah, matakuliah) == 0 && strcmp(akademikData[i].tahunAkademik, tahunAkademik) == 0 && akademikData[i].semester == semester) {
             akademikData[i].nilaiTugas = nilaiTugas;
