@@ -323,6 +323,97 @@ void addNilaiAdmin() {
 
 void editNilaiAdmin() {
     char NIM[MAX_NIM_LENGTH + 1];
+    int semester;
+    char matakuliah[MAX_MATKUL_LENGTH + 1];
+    char tahunAkademik[MAX_TAHUN_AKADEMIK_LENGTH + 1];
+
+    // Input data untuk identifikasi nilai yang akan diedit
+    printf("Masukkan NIM: ");
+    fgets(NIM, sizeof(NIM), stdin);
+    strtok(NIM, "\n");  // Remove newline character
+
+    printf("Masukkan Semester: ");
+    scanf("%d", &semester);
+    getchar();  // Consume newline character left in buffer
+
+    printf("Masukkan Mata Kuliah: ");
+    fgets(matakuliah, sizeof(matakuliah), stdin);
+    strtok(matakuliah, "\n");  // Remove newline character
+
+    printf("Masukkan Tahun Akademik: ");
+    fgets(tahunAkademik, sizeof(tahunAkademik), stdin);
+    strtok(tahunAkademik, "\n");  // Remove newline character
+
+    int foundIndex = -1;
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0 &&
+            akademikData[i].semester == semester &&
+            strcmp(akademikData[i].matakuliah, matakuliah) == 0 &&
+            strcmp(akademikData[i].tahunAkademik, tahunAkademik) == 0) {
+            foundIndex = i;
+            break;
+        }
+    }
+
+    if (foundIndex != -1) {
+        char nilaiTugasStr[10];
+        char nilaiUTSStr[10];
+        char nilaiUASStr[10];
+        float nilaiTugas, nilaiUTS, nilaiUAS;
+
+        // Input updated data nilai
+        printf("Masukkan Nilai Tugas baru (kosongkan jika tidak ingin mengubah): ");
+        fgets(nilaiTugasStr, sizeof(nilaiTugasStr), stdin);
+        strtok(nilaiTugasStr, "\n");  // Remove newline character
+
+        printf("Masukkan Nilai UTS baru (kosongkan jika tidak ingin mengubah): ");
+        fgets(nilaiUTSStr, sizeof(nilaiUTSStr), stdin);
+        strtok(nilaiUTSStr, "\n");  // Remove newline character
+
+        printf("Masukkan Nilai UAS baru (kosongkan jika tidak ingin mengubah): ");
+        fgets(nilaiUASStr, sizeof(nilaiUASStr), stdin);
+        strtok(nilaiUASStr, "\n");  // Remove newline character
+
+        // Update data nilai jika input tidak kosong
+        if (strcmp(nilaiTugasStr, "") != 0) {
+            sscanf(nilaiTugasStr, "%f", &nilaiTugas);
+            akademikData[foundIndex].nilaiTugas = nilaiTugas;
+        }
+        if (strcmp(nilaiUTSStr, "") != 0) {
+            sscanf(nilaiUTSStr, "%f", &nilaiUTS);
+            akademikData[foundIndex].nilaiUTS = nilaiUTS;
+        }
+        if (strcmp(nilaiUASStr, "") != 0) {
+            sscanf(nilaiUASStr, "%f", &nilaiUAS);
+            akademikData[foundIndex].nilaiUAS = nilaiUAS;
+        }
+
+        // Menghitung ulang nilai grade jika nilai diupdate
+        if (strcmp(nilaiTugasStr, "") != 0 || strcmp(nilaiUTSStr, "") != 0 || strcmp(nilaiUASStr, "") != 0) {
+            float totalNilai = (akademikData[foundIndex].nilaiTugas * 0.3) +
+                               (akademikData[foundIndex].nilaiUTS * 0.3) +
+                               (akademikData[foundIndex].nilaiUAS * 0.4);
+            if (totalNilai >= 80) {
+                akademikData[foundIndex].grade = 'A';
+            } else if (totalNilai >= 70) {
+                akademikData[foundIndex].grade = 'B';
+            } else if (totalNilai >= 60) {
+                akademikData[foundIndex].grade = 'C';
+            } else if (totalNilai >= 50) {
+                akademikData[foundIndex].grade = 'D';
+            } else {
+                akademikData[foundIndex].grade = 'E';
+            }
+        }
+
+        printf("Nilai berhasil diupdate.\n");
+    } else {
+        printf("Nilai tidak ditemukan.\n");
+    }
+}
+
+void editNilaiAdmin_old() {
+    char NIM[MAX_NIM_LENGTH + 1];
     char matakuliah[MAX_MATKUL_LENGTH + 1];
     char tahunAkademik[MAX_TAHUN_AKADEMIK_LENGTH + 1];
     int semester;
@@ -414,6 +505,53 @@ void editNilaiAdmin() {
             }
         }
 
+        printf("Nilai tidak ditemukan.\n");
+    }
+}
+
+
+void deleteNilaiAdmin() {
+    char NIM[MAX_NIM_LENGTH + 1];
+    int semester;
+    char matakuliah[MAX_MATKUL_LENGTH + 1];
+    char tahunAkademik[MAX_TAHUN_AKADEMIK_LENGTH + 1];
+
+    // Input data untuk identifikasi nilai yang akan dihapus
+    printf("Masukkan NIM: ");
+    fgets(NIM, sizeof(NIM), stdin);
+    strtok(NIM, "\n");  // Remove newline character
+
+    printf("Masukkan Semester: ");
+    scanf("%d", &semester);
+    getchar();  // Consume newline character left in buffer
+
+    printf("Masukkan Mata Kuliah: ");
+    fgets(matakuliah, sizeof(matakuliah), stdin);
+    strtok(matakuliah, "\n");  // Remove newline character
+
+    printf("Masukkan Tahun Akademik: ");
+    fgets(tahunAkademik, sizeof(tahunAkademik), stdin);
+    strtok(tahunAkademik, "\n");  // Remove newline character
+
+    int foundIndex = -1;
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0 &&
+            akademikData[i].semester == semester &&
+            strcmp(akademikData[i].matakuliah, matakuliah) == 0 &&
+            strcmp(akademikData[i].tahunAkademik, tahunAkademik) == 0) {
+            foundIndex = i;
+            break;
+        }
+    }
+
+    if (foundIndex != -1) {
+        // Menggeser elemen setelah nilai yang dihapus
+        for (int i = foundIndex; i < akademikCount - 1; i++) {
+            akademikData[i] = akademikData[i + 1];
+        }
+        akademikCount--;
+        printf("Nilai berhasil dihapus.\n");
+    } else {
         printf("Nilai tidak ditemukan.\n");
     }
 }
@@ -613,12 +751,15 @@ int main_admin() {
                             viewNilaiAdmin();
                             break;
                         case 4:
+                            deleteNilaiAdmin();
+                            break;
+                        case 5:
                             break;  // Keluar dari loop
                         default:
                             printf("Pilihan tidak valid.\n");
                             break;
                     }
-                } while (choice != 4);
+                } while (choice != 5);
                 break;
             case 3:
                 do {
