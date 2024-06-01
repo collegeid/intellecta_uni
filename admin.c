@@ -113,7 +113,7 @@ void editMahasiswaAdmin() {
     if (!checkNIM(NIM)) {
         printf("NIM tidak terdaftar.\n");
         return;
-    }
+    } else {
 
     char nama[MAX_NAMA_LENGTH + 1];
     char kelas[MAX_KELAS_LENGTH + 1];
@@ -154,6 +154,7 @@ void editMahasiswaAdmin() {
             return;
         }
     }
+    }
 }
 
 void deleteMahasiswaAdmin() {
@@ -165,7 +166,7 @@ void deleteMahasiswaAdmin() {
     if (!checkNIM(NIM)) {
         printf("NIM tidak terdaftar.\n");
         return;
-    }
+    } else {
 
     // Remove student data
     for (int i = 0; i < mahasiswaCount; i++) {
@@ -190,6 +191,8 @@ void deleteMahasiswaAdmin() {
             }
         }
     }
+
+}
 }
 
 void viewMahasiswaAdmin() {
@@ -268,7 +271,7 @@ void editNilaiAdmin() {
     if (!checkNIM(NIM)) {
         printf("NIM tidak terdaftar.\n");
         return;
-    }
+    } else {
 
     printf("Masukkan Mata Kuliah: ");
     fgets(matakuliah, sizeof(matakuliah), stdin);
@@ -305,6 +308,7 @@ void editNilaiAdmin() {
     }
 
     printf("Nilai tidak ditemukan.\n");
+    }
 }
 
 void viewNilaiAdmin() {
@@ -316,7 +320,7 @@ void viewNilaiAdmin() {
     if (!checkNIM(NIM)) {
         printf("NIM tidak terdaftar.\n");
         return;
-    }
+    } else {
 
     printf("Nilai Mahasiswa:\n");
     for (int i = 0; i < akademikCount; i++) {
@@ -325,6 +329,7 @@ void viewNilaiAdmin() {
                    akademikData[i].matakuliah, akademikData[i].tahunAkademik, akademikData[i].semester,
                    akademikData[i].nilaiTugas, akademikData[i].nilaiUTS, akademikData[i].nilaiUAS);
         }
+    }
     }
 }
 
