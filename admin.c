@@ -609,7 +609,7 @@ int main_admin() {
                 break;
             case 3:
                 do {
-                    printf("Manajemen Mata Kuliah:\n1. Tambah Mata Kuliah\n2. Edit Mata Kuliah\n3. Hapus Mata Kuliah\n4. Kembali ke Menu Utama\n");
+                    printf("Manajemen Mata Kuliah:\n1. Tambah Mata Kuliah\n2. Edit Mata Kuliah\n3. Hapus Mata Kuliah\n4. List Mata Kuliah \n5. Kembali ke Menu Utama\n");
                     printf("Masukkan pilihan: ");
                     scanf("%d", &choice);
                     getchar();  // Consume newline character left in buffer
@@ -625,6 +625,9 @@ int main_admin() {
                             deleteMatakuliahAdmin();
                             break;
                         case 4:
+                            displayMatakuliah();
+                            break;
+                        case 5:
                             break;  // Keluar dari loop
                         default:
                             printf("Pilihan tidak valid.\n");
