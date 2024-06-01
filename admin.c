@@ -493,6 +493,15 @@ void addMatakuliahAdmin() {
 }
 
 
+void viewMatakuliahAdmin() {
+    printf("Daftar Mata Kuliah:\n");
+    for (int i = 0; i < matakuliahCount; i++) {
+        printf("ID: %d, Mata Kuliah: %s, SKS: %d\n",
+               matakuliahData[i].id, matakuliahData[i].matakuliah, matakuliahData[i].sks);
+    }
+}
+
+
 void editMatakuliahAdmin() {
     int id;
     printf("Masukkan ID Mata Kuliah yang akan diedit: ");
@@ -509,6 +518,7 @@ void editMatakuliahAdmin() {
 
     if (foundIndex != -1) {
         char namaMatkul[MAX_MATKUL_LENGTH + 1];
+        char sksStr[10];
         int sks;
 
         // Input updated data mata kuliah
@@ -517,15 +527,18 @@ void editMatakuliahAdmin() {
         strtok(namaMatkul, "\n");  // Remove newline character
 
         printf("Masukkan Jumlah SKS baru (kosongkan jika tidak ingin mengubah): ");
-        scanf("%d", &sks);
-        getchar();  // Consume newline character left in buffer
+        fgets(sksStr, sizeof(sksStr), stdin);
+        strtok(sksStr, "\n");  // Remove newline character
 
         // Update data mata kuliah jika input tidak kosong
         if (strcmp(namaMatkul, "") != 0) {
             strncpy(matakuliahData[foundIndex].matakuliah, namaMatkul, MAX_MATKUL_LENGTH);
         }
-        if (sks > 0) {
-            matakuliahData[foundIndex].sks = sks;
+        if (strcmp(sksStr, "") != 0) {
+            sscanf(sksStr, "%d", &sks);
+            if (sks > 0) {
+                matakuliahData[foundIndex].sks = sks;
+            }
         }
 
         printf("Data Mata Kuliah berhasil diupdate.\n");
@@ -625,7 +638,7 @@ int main_admin() {
                             deleteMatakuliahAdmin();
                             break;
                         case 4:
-                            displayMatakuliah();
+                            viewMatakuliahAdmin();
                             break;
                         case 5:
                             break;  // Keluar dari loop
