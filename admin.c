@@ -455,10 +455,23 @@ void viewNilaiAdmin() {
     }
 }
 
-
 void addMatakuliahAdmin() {
+    int id;
     char namaMatkul[MAX_MATKUL_LENGTH + 1];
     int sks;
+
+    // Input ID mata kuliah
+    printf("Masukkan ID Mata Kuliah: ");
+    scanf("%d", &id);
+    getchar();  // Consume newline character left in buffer
+
+    // Check if ID is already taken
+    for (int i = 0; i < matakuliahCount; i++) {
+        if (matakuliahData[i].id == id) {
+            printf("ID sudah terpakai. Silakan masukkan ID yang lain.\n");
+            return;
+        }
+    }
 
     // Input data mata kuliah
     printf("Masukkan Nama Mata Kuliah: ");
@@ -471,7 +484,7 @@ void addMatakuliahAdmin() {
     getchar();  // Consume newline character left in buffer
 
     // Tambahkan mata kuliah ke dalam array
-    matakuliahData[matakuliahCount].id = matakuliahCount + 1; // ID diisi sesuai dengan indeks ke matakuliahData + 1
+    matakuliahData[matakuliahCount].id = id; // ID diisi sesuai dengan input pengguna
     strncpy(matakuliahData[matakuliahCount].matakuliah, namaMatkul, MAX_MATKUL_LENGTH);
     matakuliahData[matakuliahCount].sks = sks;
     matakuliahCount++;
