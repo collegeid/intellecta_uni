@@ -419,26 +419,139 @@ void editNilaiAdmin() {
 }
 
 void viewNilaiAdmin() {
-    char NIM[MAX_NIM_LENGTH + 1];
-    printf("Masukkan NIM untuk melihat nilai: ");
-    fgets(NIM, sizeof(NIM), stdin);
-    strtok(NIM, "\n");  // Remove newline character
+    int choice;
+    printf("Pilih opsi:\n1. Cari nilai berdasarkan NIM\n2. Tampilkan semua nilai\nMasukkan pilihan: ");
+    scanf("%d", &choice);
+    getchar();  // Consume newline character left in buffer
 
-    if (!checkNIM(NIM)) {
-        printf("NIM tidak terdaftar.\n");
-        return;
-    } else {
+    if (choice == 1) {
+        char NIM[MAX_NIM_LENGTH + 1];
+        printf("Masukkan NIM untuk melihat nilai: ");
+        fgets(NIM, sizeof(NIM), stdin);
+        strtok(NIM, "\n");  // Remove newline character
 
-    printf("Nilai Mahasiswa:\n");
-    for (int i = 0; i < akademikCount; i++) {
-        if (strcmp(akademikData[i].NIM, NIM) == 0) {
-            printf("Mata Kuliah: %s, Tahun Akademik: %s, Semester: %d, Nilai Tugas: %.2f, Nilai UTS: %.2f, Nilai UAS: %.2f\n",
-                   akademikData[i].matakuliah, akademikData[i].tahunAkademik, akademikData[i].semester,
+        if (!checkNIM(NIM)) {
+            printf("NIM tidak terdaftar.\n");
+            return;
+        } else {
+            printf("Nilai Mahasiswa:\n");
+            for (int i = 0; i < akademikCount; i++) {
+                if (strcmp(akademikData[i].NIM, NIM) == 0) {
+                    printf("Mata Kuliah: %s, Tahun Akademik: %s, Semester: %d, Nilai Tugas: %.2f, Nilai UTS: %.2f, Nilai UAS: %.2f\n",
+                           akademikData[i].matakuliah, akademikData[i].tahunAkademik, akademikData[i].semester,
+                           akademikData[i].nilaiTugas, akademikData[i].nilaiUTS, akademikData[i].nilaiUAS);
+                }
+            }
+        }
+    } else if (choice == 2) {
+        printf("Nilai Semua Mahasiswa:\n");
+        for (int i = 0; i < akademikCount; i++) {
+            printf("NIM: %s, Mata Kuliah: %s, Tahun Akademik: %s, Semester: %d, Nilai Tugas: %.2f, Nilai UTS: %.2f, Nilai UAS: %.2f\n",
+                   akademikData[i].NIM, akademikData[i].matakuliah, akademikData[i].tahunAkademik, akademikData[i].semester,
                    akademikData[i].nilaiTugas, akademikData[i].nilaiUTS, akademikData[i].nilaiUAS);
         }
-    }
+    } else {
+        printf("Pilihan tidak valid.\n");
     }
 }
+
+
+void addMatakuliahAdmin() {
+    char namaMatkul[MAX_MATKUL_LENGTH + 1];
+    int sks;
+
+    // Input data mata kuliah
+    printf("Masukkan Nama Mata Kuliah: ");
+    fgets(namaMatkul, sizeof(namaMatkul), stdin);
+    strtok(namaMatkul, "\n");  // Remove newline character
+
+    // Input SKS
+    printf("Masukkan Jumlah SKS: ");
+    scanf("%d", &sks);
+    getchar();  // Consume newline character left in buffer
+
+    // Tambahkan mata kuliah ke dalam array
+    matakuliahData[matakuliahCount].id = matakuliahCount + 1; // ID diisi sesuai dengan indeks ke matakuliahData + 1
+    strncpy(matakuliahData[matakuliahCount].matakuliah, namaMatkul, MAX_MATKUL_LENGTH);
+    matakuliahData[matakuliahCount].sks = sks;
+    matakuliahCount++;
+
+    printf("Mata Kuliah berhasil ditambahkan.\n");
+}
+
+
+void editMatakuliahAdmin() {
+    int id;
+    printf("Masukkan ID Mata Kuliah yang akan diedit: ");
+    scanf("%d", &id);
+    getchar();  // Consume newline character left in buffer
+
+    int foundIndex = -1;
+    for (int i = 0; i < matakuliahCount; i++) {
+        if (matakuliahData[i].id == id) {
+            foundIndex = i;
+            break;
+        }
+    }
+
+    if (foundIndex != -1) {
+        char namaMatkul[MAX_MATKUL_LENGTH + 1];
+        int sks;
+
+        // Input updated data mata kuliah
+        printf("Masukkan Nama Mata Kuliah baru (kosongkan jika tidak ingin mengubah): ");
+        fgets(namaMatkul, sizeof(namaMatkul), stdin);
+        strtok(namaMatkul, "\n");  // Remove newline character
+
+        printf("Masukkan Jumlah SKS baru (kosongkan jika tidak ingin mengubah): ");
+        scanf("%d", &sks);
+        getchar();  // Consume newline character left in buffer
+
+        // Update data mata kuliah jika input tidak kosong
+        if (strcmp(namaMatkul, "") != 0) {
+            strncpy(matakuliahData[foundIndex].matakuliah, namaMatkul, MAX_MATKUL_LENGTH);
+        }
+        if (sks > 0) {
+            matakuliahData[foundIndex].sks = sks;
+        }
+
+        printf("Data Mata Kuliah berhasil diupdate.\n");
+    } else {
+        printf("ID Mata Kuliah tidak ditemukan.\n");
+    }
+}
+
+void deleteMatakuliahAdmin() {
+    int id;
+    printf("Masukkan ID Mata Kuliah yang akan dihapus: ");
+    scanf("%d", &id);
+    getchar();  // Consume newline character left in buffer
+
+    int foundIndex = -1;
+    for (int i = 0; i < matakuliahCount; i++) {
+        if (matakuliahData[i].id == id) {
+            foundIndex = i;
+            break;
+        }
+    }
+
+    if (foundIndex != -1) {
+        // Remove mata kuliah
+        for (int j = foundIndex; j < matakuliahCount - 1; j++) {
+            matakuliahData[j] = matakuliahData[j + 1];
+        }
+        matakuliahCount--;
+
+        printf("Mata Kuliah berhasil dihapus.\n");
+    } else {
+        printf("ID Mata Kuliah tidak ditemukan.\n");
+    }
+}
+
+
+
+
+
 
 
 
@@ -447,7 +560,7 @@ int main_admin() {
     populateSampleData();  // Memasukkan data sampel untuk pengujian
 
     do {
-        printf("Menu Admin:\n1. Manajemen Akun\n2. Manajemen Akademik\n3. Keluar\n");
+        printf("Menu Admin:\n1. Manajemen Akun\n2. Manajemen Akademik\n3. Manajemen Mata Kuliah\n4. Keluar\n");
         printf("Masukkan pilihan: ");
         scanf("%d", &choice);
         getchar();  // Consume newline character left in buffer
@@ -482,13 +595,38 @@ int main_admin() {
                 } while (choice != 4);
                 break;
             case 3:
+                do {
+                    printf("Manajemen Mata Kuliah:\n1. Tambah Mata Kuliah\n2. Edit Mata Kuliah\n3. Hapus Mata Kuliah\n4. Kembali ke Menu Utama\n");
+                    printf("Masukkan pilihan: ");
+                    scanf("%d", &choice);
+                    getchar();  // Consume newline character left in buffer
+
+                    switch (choice) {
+                        case 1:
+                            addMatakuliahAdmin();
+                            break;
+                        case 2:
+                            editMatakuliahAdmin();
+                            break;
+                        case 3:
+                            deleteMatakuliahAdmin();
+                            break;
+                        case 4:
+                            break;  // Keluar dari loop
+                        default:
+                            printf("Pilihan tidak valid.\n");
+                            break;
+                    }
+                } while (choice != 4);
+                break;
+            case 4:
                 printf("Terima kasih telah menggunakan sistem ini.\n");
                 break;
             default:
                 printf("Pilihan tidak valid.\n");
                 break;
         }
-    } while (choice != 3);
+    } while (choice != 4);
 
     // Free allocated memory
     free(mahasiswaData);
