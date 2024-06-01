@@ -646,7 +646,7 @@ int main_admin() {
                             printf("Pilihan tidak valid.\n");
                             break;
                     }
-                } while (choice != 4);
+                } while (choice != 5);
                 break;
             case 4:
                 printf("Terima kasih telah menggunakan sistem ini.\n");
