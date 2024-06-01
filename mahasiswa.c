@@ -376,20 +376,27 @@ void populateSampleData() {
     // Add sample students and their accounts
     addMahasiswa("2350081084", "Alice", "A1", "alice@example.com", "L", 1);
     addAkunMahasiswa("2350081084", "password123");
+
+    addMahasiswa("2350081081", "apalah", "A3", "mek@example.com", "L", 3);
+    addAkunMahasiswa("2350081081", "123");
+
     addMahasiswa("23456789012345", "Bob", "A2", "bob@example.com", "P", 2);
     addAkunMahasiswa("23456789012345", "password234");
 
     // Add sample courses
     addMatakuliah("Mathematics", 3);
     addMatakuliah("Physics", 4);
+    addMatakuliah("ximia", 2);
+
 
     // Add sample academic records
     addAkademik("2350081084", 1, "Mathematics", "2023/2024", 80, 75, 85);
     addAkademik("2350081084", 1, "Physics", "2023/2024", 70, 65, 75);
+    addAkademik("2350081081", 3, "ximia", "2023/2024", 99, 98, 99);
     addAkademik("2350081084", 2, "Mathematics", "2023/2024", 90, 85, 95);
 }
 
-int main() {
+int main_mahasiswa() {
     populateSampleData();
 
     int choice;
