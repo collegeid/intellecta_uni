@@ -423,7 +423,7 @@ void editNilaiAdmin() {
 void deleteNilaiAdmin() {
     char NIM[MAX_NIM_LENGTH + 1];
     int semester;
-    char matakuliah[MAX_MATKUL_LENGTH + 1];
+    int selectedMatakuliah;
     char tahunAkademik[MAX_TAHUN_AKADEMIK_LENGTH + 1];
 
     // Input data untuk identifikasi nilai yang akan dihapus
@@ -435,9 +435,19 @@ void deleteNilaiAdmin() {
     scanf("%d", &semester);
     getchar();  // Consume newline character left in buffer
 
-    printf("Masukkan Mata Kuliah: ");
-    fgets(matakuliah, sizeof(matakuliah), stdin);
-    strtok(matakuliah, "\n");  // Remove newline character
+    // Display the list of courses
+    displayMatakuliah(); // Menampilkan daftar mata kuliah
+
+    printf("Masukkan nomor Mata Kuliah yang akan dihapus nilainya: ");
+    scanf("%d", &selectedMatakuliah);
+    getchar();  // Consume newline character left in buffer
+
+    if (selectedMatakuliah < 1 || selectedMatakuliah > matakuliahCount) {
+        printf("Nomor Mata Kuliah tidak valid.\n");
+        return;
+    }
+
+    char *matakuliah = matakuliahData[selectedMatakuliah - 1].matakuliah;
 
     printf("Masukkan Tahun Akademik: ");
     fgets(tahunAkademik, sizeof(tahunAkademik), stdin);
@@ -465,6 +475,7 @@ void deleteNilaiAdmin() {
         printf("Nilai tidak ditemukan.\n");
     }
 }
+
 
 void viewNilaiAdmin() {
     int choice;
@@ -596,10 +607,20 @@ void editMatakuliahAdmin() {
 }
 
 void deleteMatakuliahAdmin() {
-    int id;
-    printf("Masukkan ID Mata Kuliah yang akan dihapus: ");
-    scanf("%d", &id);
+    // Display the list of courses
+    displayMatakuliah(); // Menampilkan daftar mata kuliah
+
+    int selectedMatakuliah;
+    printf("Masukkan nomor Mata Kuliah yang akan dihapus: ");
+    scanf("%d", &selectedMatakuliah);
     getchar();  // Consume newline character left in buffer
+
+    if (selectedMatakuliah < 1 || selectedMatakuliah > matakuliahCount) {
+        printf("Nomor Mata Kuliah tidak valid.\n");
+        return;
+    }
+
+    int id = matakuliahData[selectedMatakuliah - 1].id;
 
     int foundIndex = -1;
     for (int i = 0; i < matakuliahCount; i++) {
@@ -618,9 +639,10 @@ void deleteMatakuliahAdmin() {
 
         printf("Mata Kuliah berhasil dihapus.\n");
     } else {
-        printf("ID Mata Kuliah tidak ditemukan.\n");
+        printf("Mata Kuliah tidak ditemukan.\n");
     }
 }
+
 
 
 
