@@ -42,7 +42,6 @@ void adminMenu() {
         }
     } while (choice != 5);
 }
-
 void addMahasiswaAdmin() {
     char NIM[MAX_NIM_LENGTH + 1];
     char password[MAX_PASSWORD_LENGTH + 1];
@@ -92,7 +91,7 @@ void addMahasiswaAdmin() {
         printf("Masukkan Gender (L/P): ");
         fgets(gender, sizeof(gender), stdin);
         strtok(gender, "\n");  // Remove newline character
-    } while (strcmp(gender, "") == 0 || strlen(gender) > MAX_GENDER_LENGTH);
+    } while (strcmp(gender, "") == 0 || (strcmp(gender, "L") != 0 && strcmp(gender, "P") != 0));
 
     printf("Masukkan Semester: ");
     scanf("%d", &semester);
@@ -114,48 +113,71 @@ void editMahasiswaAdmin() {
         printf("NIM tidak terdaftar.\n");
         return;
     } else {
+        char nama[MAX_NAMA_LENGTH + 1];
+        char kelas[MAX_KELAS_LENGTH + 1];
+        char email[MAX_EMAIL_LENGTH + 1];
+        char gender[MAX_GENDER_LENGTH + 1];
+        int semester;
 
-    char nama[MAX_NAMA_LENGTH + 1];
-    char kelas[MAX_KELAS_LENGTH + 1];
-    char email[MAX_EMAIL_LENGTH + 1];
-    char gender[MAX_GENDER_LENGTH + 1];
-    int semester;
-
-    // Input updated student data
-    printf("Masukkan Nama baru: ");
-    fgets(nama, sizeof(nama), stdin);
-    strtok(nama, "\n");  // Remove newline character
-
-    printf("Masukkan Kelas baru: ");
-    fgets(kelas, sizeof(kelas), stdin);
-    strtok(kelas, "\n");  // Remove newline character
-
-    printf("Masukkan Email baru: ");
-    fgets(email, sizeof(email), stdin);
-    strtok(email, "\n");  // Remove newline character
-
-    printf("Masukkan Gender baru (L/P): ");
-    fgets(gender, sizeof(gender), stdin);
-    strtok(gender, "\n");  // Remove newline character
-
-    printf("Masukkan Semester baru: ");
-    scanf("%d", &semester);
-    getchar();  // Consume newline character left in buffer
-
-    // Update student data
-    for (int i = 0; i < mahasiswaCount; i++) {
-        if (strcmp(mahasiswaData[i].NIM, NIM) == 0) {
-            strncpy(mahasiswaData[i].nama, nama, MAX_NAMA_LENGTH);
-            strncpy(mahasiswaData[i].kelas, kelas, MAX_KELAS_LENGTH);
-            strncpy(mahasiswaData[i].email, email, MAX_EMAIL_LENGTH);
-            strncpy(mahasiswaData[i].gender, gender, MAX_GENDER_LENGTH);
-            mahasiswaData[i].semester = semester;
-            printf("Data Mahasiswa berhasil diupdate.\n");
-            return;
+        // Find student data
+        int studentIndex = -1;
+        for (int i = 0; i < mahasiswaCount; i++) {
+            if (strcmp(mahasiswaData[i].NIM, NIM) == 0) {
+                studentIndex = i;
+                break;
+            }
         }
-    }
+
+        // Display previous student data
+        printf("Data Mahasiswa Sebelumnya:\n");
+        printf("Nama: %s\n", mahasiswaData[studentIndex].nama);
+        printf("Kelas: %s\n", mahasiswaData[studentIndex].kelas);
+        printf("Email: %s\n", mahasiswaData[studentIndex].email);
+        printf("Gender: %s\n", mahasiswaData[studentIndex].gender);
+        printf("Semester: %d\n", mahasiswaData[studentIndex].semester);
+
+        // Input updated student data
+        printf("Masukkan Nama baru (kosongkan jika tidak ingin mengubah): ");
+        fgets(nama, sizeof(nama), stdin);
+        strtok(nama, "\n");  // Remove newline character
+
+        printf("Masukkan Kelas baru (kosongkan jika tidak ingin mengubah): ");
+        fgets(kelas, sizeof(kelas), stdin);
+        strtok(kelas, "\n");  // Remove newline character
+
+        printf("Masukkan Email baru (kosongkan jika tidak ingin mengubah): ");
+        fgets(email, sizeof(email), stdin);
+        strtok(email, "\n");  // Remove newline character
+
+        printf("Masukkan Gender baru (L/P, kosongkan jika tidak ingin mengubah): ");
+        fgets(gender, sizeof(gender), stdin);
+        strtok(gender, "\n");  // Remove newline character
+
+        printf("Masukkan Semester baru (kosongkan jika tidak ingin mengubah): ");
+        scanf("%d", &semester);
+        getchar();  // Consume newline character left in buffer
+
+        // Update student data if input is not empty
+        if (strcmp(nama, "") != 0) {
+            strncpy(mahasiswaData[studentIndex].nama, nama, MAX_NAMA_LENGTH);
+        }
+        if (strcmp(kelas, "") != 0) {
+            strncpy(mahasiswaData[studentIndex].kelas, kelas, MAX_KELAS_LENGTH);
+        }
+        if (strcmp(email, "") != 0) {
+            strncpy(mahasiswaData[studentIndex].email, email, MAX_EMAIL_LENGTH);
+        }
+        if (strcmp(gender, "") != 0 && (strcmp(gender, "L") == 0 || strcmp(gender, "P") == 0)) {
+            strncpy(mahasiswaData[studentIndex].gender, gender, MAX_GENDER_LENGTH);
+        }
+        if (semester > 0) {
+            mahasiswaData[studentIndex].semester = semester;
+        }
+
+        printf("Data Mahasiswa berhasil diupdate.\n");
     }
 }
+
 
 void deleteMahasiswaAdmin() {
     char NIM[MAX_NIM_LENGTH + 1];
@@ -196,9 +218,42 @@ void deleteMahasiswaAdmin() {
 }
 
 void viewMahasiswaAdmin() {
-    printf("Data Mahasiswa:\n");
-    for (int i = 0; i < mahasiswaCount; i++) {
-        printf("NIM: %s, Nama: %s, Kelas: %s, Email: %s, Gender: %s, Semester: %d\n", mahasiswaData[i].NIM, mahasiswaData[i].nama, mahasiswaData[i].kelas, mahasiswaData[i].email, mahasiswaData[i].gender, mahasiswaData[i].semester);
+    printf("Pilihan: \n");
+    printf("1. Lihat berdasarkan NIM\n");
+    printf("2. Tampilkan semua mahasiswa\n");
+    printf("Pilih opsi: ");
+
+    int option;
+    scanf("%d", &option);
+    getchar();  // Consume newline character left in buffer
+
+    switch (option) {
+        case 1:
+            printf("Masukkan NIM: ");
+            char targetNIM[MAX_NIM_LENGTH + 1];
+            fgets(targetNIM, sizeof(targetNIM), stdin);
+            strtok(targetNIM, "\n");  // Remove newline character
+
+            for (int i = 0; i < mahasiswaCount; i++) {
+                if (strcmp(mahasiswaData[i].NIM, targetNIM) == 0) {
+                    printf("Data Mahasiswa:\n");
+                    printf("NIM: %s, Nama: %s, Kelas: %s, Email: %s, Gender: %s, Semester: %d\n", mahasiswaData[i].NIM, mahasiswaData[i].nama, mahasiswaData[i].kelas, mahasiswaData[i].email, mahasiswaData[i].gender, mahasiswaData[i].semester);
+                    return;
+                }
+            }
+            printf("Mahasiswa dengan NIM %s tidak ditemukan.\n", targetNIM);
+            break;
+
+        case 2:
+            printf("Data Mahasiswa:\n");
+            for (int i = 0; i < mahasiswaCount; i++) {
+                printf("NIM: %s, Nama: %s, Kelas: %s, Email: %s, Gender: %s, Semester: %d\n", mahasiswaData[i].NIM, mahasiswaData[i].nama, mahasiswaData[i].kelas, mahasiswaData[i].email, mahasiswaData[i].gender, mahasiswaData[i].semester);
+            }
+            break;
+
+        default:
+            printf("Opsi tidak valid.\n");
+            break;
     }
 }
 

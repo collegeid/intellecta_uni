@@ -154,8 +154,6 @@ void addMatakuliah(const char matakuliah[], int sks) {
     matakuliahData[matakuliahCount].sks = sks;
     matakuliahCount++;
 }
-
-// Function to register a new student
 void registerMahasiswa() {
     char NIM[MAX_NIM_LENGTH + 1];
     char password[MAX_PASSWORD_LENGTH + 1];
@@ -205,7 +203,7 @@ void registerMahasiswa() {
         printf("Masukkan Gender (L/P): ");
         fgets(gender, sizeof(gender), stdin);
         strtok(gender, "\n"); // Remove newline character
-    } while (strcmp(gender, "") == 0 || strcmp(gender, "\n") == 0 || strlen(gender) > MAX_GENDER_LENGTH);
+    } while (strcmp(gender, "") == 0 || strcmp(gender, "\n") == 0 || strlen(gender) > MAX_GENDER_LENGTH || (strcmp(gender, "L") != 0 && strcmp(gender, "P") != 0));
 
     printf("Masukkan Semester: ");
     scanf("%d", &semester);
@@ -216,6 +214,7 @@ void registerMahasiswa() {
     addMahasiswa(NIM, nama, kelas, email, gender, semester);
     printf("Registrasi berhasil.\n");
 }
+
 
 // Function to log in
 void login() {

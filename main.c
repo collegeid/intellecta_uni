@@ -5,7 +5,7 @@
 
 
 int main() {
-    int role;
+    int role = 1;
     printf("Selamat datang!\n");
     printf("Pilih peran Anda:\n");
     printf("1. Mahasiswa\n");
