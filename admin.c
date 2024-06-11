@@ -12,8 +12,61 @@ void viewMahasiswaAdmin();
 void addNilaiAdmin();
 void editNilaiAdmin();
 void viewNilaiAdmin();
+void printTableHeader();
+void printTableRow();
+void printTableFooter();
+void printNilaiTableHeader();
+void printNilaiTableRow();
+void printNilaiTableFooter();
+void printMatakuliahTableHeader();
+void printMatakuliahTableRow();
+void printMatakuliahTableFooter();
+
+void printMatakuliahTableHeader() {
+    printf("+----+-------------------------+-----+\n");
+    printf("| ID |      Mata Kuliah        | SKS |\n");
+    printf("+----+-------------------------+-----+\n");
+}
+
+void printMatakuliahTableRow(Matakuliah m) {
+    printf("| %-2d | %-23s | %-3d |\n", m.id, m.matakuliah, m.sks);
+}
+
+void printMatakuliahTableFooter() {
+    printf("+----+-------------------------+-----+\n");
+}
 
 
+void printNilaiTableHeader() {
+    printf("+-----------------+-------------------------+-----------------+-----------+-------------+---------+---------+---------+\n");
+    printf("|       NIM       |      Mata Kuliah        |  Tahun Akademik | Semester  | Nilai Tugas | Nilai UTS | Nilai UAS |\n");
+    printf("+-----------------+-------------------------+-----------------+-----------+-------------+---------+---------+---------+\n");
+}
+
+void printNilaiTableRow(Akademik a) {
+    printf("| %-15s | %-23s | %-15s | %-9d | %-11.2f | %-7.2f | %-7.2f |\n", 
+           a.NIM, a.matakuliah, a.tahunAkademik, a.semester, a.nilaiTugas, a.nilaiUTS, a.nilaiUAS);
+}
+
+void printNilaiTableFooter() {
+    printf("+-----------------+-------------------------+-----------------+-----------+-------------+---------+---------+---------+\n");
+}
+
+
+void printTableHeader() {
+    printf("+-----------------+------------------------+-----------+------------------------+--------+-----------+\n");
+    printf("|       NIM       |          Nama          |   Kelas   |         Email          | Gender | Semester  |\n");
+    printf("+-----------------+------------------------+-----------+------------------------+--------+-----------+\n");
+}
+
+void printTableRow(Mahasiswa m) {
+    printf("| %-15s | %-22s | %-9s | %-22s | %-6s | %-9d |\n", 
+           m.NIM, m.nama, m.kelas, m.email, m.gender, m.semester);
+}
+
+void printTableFooter() {
+    printf("+-----------------+------------------------+-----------+------------------------+--------+-----------+\n");
+}
 
 // Fungsi untuk login admin
 void loginAdmin() {
@@ -266,19 +319,21 @@ void viewMahasiswaAdmin() {
 
             for (int i = 0; i < mahasiswaCount; i++) {
                 if (strcmp(mahasiswaData[i].NIM, targetNIM) == 0) {
-                    printf("Data Mahasiswa:\n");
-                    printf("NIM: %s, Nama: %s, Kelas: %s, Email: %s, Gender: %s, Semester: %d\n", mahasiswaData[i].NIM, mahasiswaData[i].nama, mahasiswaData[i].kelas, mahasiswaData[i].email, mahasiswaData[i].gender, mahasiswaData[i].semester);
-                    return;
+                    printTableHeader();
+                    printTableRow(mahasiswaData[i]);
+                    printTableFooter();
+                    return 0;
                 }
             }
             printf("Mahasiswa dengan NIM %s tidak ditemukan.\n", targetNIM);
             break;
 
         case 2:
-            printf("Data Mahasiswa:\n");
+             printTableHeader();
             for (int i = 0; i < mahasiswaCount; i++) {
-                printf("NIM: %s, Nama: %s, Kelas: %s, Email: %s, Gender: %s, Semester: %d\n", mahasiswaData[i].NIM, mahasiswaData[i].nama, mahasiswaData[i].kelas, mahasiswaData[i].email, mahasiswaData[i].gender, mahasiswaData[i].semester);
+                printTableRow(mahasiswaData[i]);
             }
+            printTableFooter();
             break;
 
         default:
@@ -507,42 +562,48 @@ void deleteNilaiAdmin() {
 }
 
 
-void viewNilaiAdmin() {
-    int choice;
-    printf("Pilih opsi:\n1. Cari nilai berdasarkan NIM\n2. Tampilkan semua nilai\nMasukkan pilihan: ");
-    scanf("%d", &choice);
-    getchar();  // Consume newline character left in buffer
+ void viewNilaiAdmin() {
+        int choice;
+        printf("Pilih opsi:\n1. Cari nilai berdasarkan NIM\n2. Tampilkan semua nilai\nMasukkan pilihan: ");
+        scanf("%d", &choice);
+        getchar();  // Consume newline character left in buffer
 
-    if (choice == 1) {
-        char NIM[MAX_NIM_LENGTH + 1];
-        printf("Masukkan NIM untuk melihat nilai: ");
-        fgets(NIM, sizeof(NIM), stdin);
-        strtok(NIM, "\n");  // Remove newline character
+        if (choice == 1) {
+            char NIM[MAX_NIM_LENGTH + 1];
+            printf("Masukkan NIM untuk melihat nilai: ");
+            fgets(NIM, sizeof(NIM), stdin);
+            strtok(NIM, "\n");  // Remove newline character
 
-        if (!checkNIM(NIM)) {
-            printf("NIM tidak terdaftar.\n");
-            return;
-        } else {
-            printf("Nilai Mahasiswa:\n");
-            for (int i = 0; i < akademikCount; i++) {
-                if (strcmp(akademikData[i].NIM, NIM) == 0) {
-                    printf("Mata Kuliah: %s, Tahun Akademik: %s, Semester: %d, Nilai Tugas: %.2f, Nilai UTS: %.2f, Nilai UAS: %.2f\n",
-                           akademikData[i].matakuliah, akademikData[i].tahunAkademik, akademikData[i].semester,
-                           akademikData[i].nilaiTugas, akademikData[i].nilaiUTS, akademikData[i].nilaiUAS);
+            if (!checkNIM(NIM)) {
+                printf("NIM tidak terdaftar.\n");
+                return;
+            } else {
+                int found = 0;
+                printNilaiTableHeader();
+                for (int i = 0; i < akademikCount; i++) {
+                    if (strcmp(akademikData[i].NIM, NIM) == 0) {
+                        printNilaiTableRow(akademikData[i]);
+                        found = 1;
+                    }
+                }
+                printNilaiTableFooter();
+                if (!found) {
+                    printf("Mahasiswa dengan NIM %s tidak ditemukan.\n", NIM);
                 }
             }
+        } else if (choice == 2) {
+            printNilaiTableHeader();
+            for (int i = 0; i < akademikCount; i++) {
+                printNilaiTableRow(akademikData[i]);
+            }
+            printNilaiTableFooter();
+        } else {
+            printf("Pilihan tidak valid.\n");
         }
-    } else if (choice == 2) {
-        printf("Nilai Semua Mahasiswa:\n");
-        for (int i = 0; i < akademikCount; i++) {
-            printf("NIM: %s, Mata Kuliah: %s, Tahun Akademik: %s, Semester: %d, Nilai Tugas: %.2f, Nilai UTS: %.2f, Nilai UAS: %.2f\n",
-                   akademikData[i].NIM, akademikData[i].matakuliah, akademikData[i].tahunAkademik, akademikData[i].semester,
-                   akademikData[i].nilaiTugas, akademikData[i].nilaiUTS, akademikData[i].nilaiUAS);
-        }
-    } else {
-        printf("Pilihan tidak valid.\n");
     }
-}
+
+    // Call the function for demonstration
+
 
 
 void addMatakuliahAdmin() {
@@ -572,14 +633,14 @@ void addMatakuliahAdmin() {
 }
 
 
-
-void viewMatakuliahAdmin() {
-    printf("Daftar Mata Kuliah:\n");
-    for (int i = 0; i < matakuliahCount; i++) {
-        printf("ID: %d, Mata Kuliah: %s, SKS: %d\n",
-               matakuliahData[i].id, matakuliahData[i].matakuliah, matakuliahData[i].sks);
+ void viewMatakuliahAdmin() {
+        printMatakuliahTableHeader();
+        for (int i = 0; i < matakuliahCount; i++) {
+            printMatakuliahTableRow(matakuliahData[i]);
+        }
+        printMatakuliahTableFooter();
     }
-}
+
 
 
 void editMatakuliahAdmin() {

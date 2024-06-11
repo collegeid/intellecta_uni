@@ -1,51 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-
-#define MAX_NIM_LENGTH 14
-#define MAX_PASSWORD_LENGTH 19
-#define MAX_NAMA_LENGTH 49
-#define MAX_KELAS_LENGTH 9
-#define MAX_EMAIL_LENGTH 49
-#define MAX_GENDER_LENGTH 9
-#define MAX_MATKUL_LENGTH 49
-#define MAX_TAHUN_AKADEMIK_LENGTH 9
-
-// Define structures for student profile, account, academic records, courses, and grades
-typedef struct {
-    int id;
-    char NIM[MAX_NIM_LENGTH + 1];
-    char nama[MAX_NAMA_LENGTH + 1];
-    char kelas[MAX_KELAS_LENGTH + 1];
-    char email[MAX_EMAIL_LENGTH + 1];
-    char gender[MAX_GENDER_LENGTH + 1];
-    int semester;
-    float IP;
-} Mahasiswa;
-
-typedef struct {
-    char NIM[MAX_NIM_LENGTH + 1];
-    char password[MAX_PASSWORD_LENGTH + 1];
-} AkunMahasiswa;
-
-typedef struct {
-    int id;
-    char matakuliah[MAX_MATKUL_LENGTH + 1];
-    int sks;
-} Matakuliah;
-
-typedef struct {
-    int id;
-    char NIM[MAX_NIM_LENGTH + 1];
-    int semester;
-    char matakuliah[MAX_MATKUL_LENGTH + 1];
-    char tahunAkademik[MAX_TAHUN_AKADEMIK_LENGTH + 1];
-    float nilaiTugas;
-    float nilaiUTS;
-    float nilaiUAS;
-    char grade;
-} Akademik;
+#include "base.h"
 
 // Global variables to store data
 Mahasiswa *mahasiswaData = NULL;
@@ -268,19 +221,22 @@ void login() {
 void checkProfile(const char NIM[]) {
     for (int i = 0; i < mahasiswaCount; i++) {
         if (strcmp(mahasiswaData[i].NIM, NIM) == 0) {
-            printf("Profil Mahasiswa:\n");
-            printf("NIM: %s\n", mahasiswaData[i].NIM);
-            printf("Nama: %s\n", mahasiswaData[i].nama);
-            printf("Kelas: %s\n", mahasiswaData[i].kelas);
-            printf("Email: %s\n", mahasiswaData[i].email);
-            printf("Gender: %s\n", mahasiswaData[i].gender);
-            printf("Semester: %d\n", mahasiswaData[i].semester);
-         
+            printf("------------------------------------------------------------\n");
+            printf("======================= Data Diri Anda =====================\n");
+            printf("------------------------------------------------------------\n");
+            printf("NIM      : %s\n", mahasiswaData[i].NIM);
+            printf("Nama     : %s\n", mahasiswaData[i].nama);
+            printf("Kelas    : %s\n", mahasiswaData[i].kelas);
+            printf("Email    : %s\n", mahasiswaData[i].email);
+            printf("Gender   : %s\n", mahasiswaData[i].gender);
+            printf("Semester : %d\n", mahasiswaData[i].semester);
+            printf("------------------------------------------------------------\n");
             return;
         }
     }
     printf("Profil tidak ditemukan.\n");
 }
+
 
 // Function to display academic records
 void displayAkademik(const char NIM[]) {
@@ -321,6 +277,55 @@ void displayAkademik(const char NIM[]) {
     printf("IPK: %.2f\n", IPK > 4.0 ? 4.0 : IPK);
 }
 
+// Function to display academic records
+void displayAkademik2(const char NIM[]) {
+    printf("------------------------------------------------------------\n");
+    printf("===================== Rekam Akademik =======================\n");
+    printf("------------------------------------------------------------\n");
+    
+    int currentSemester = -1;
+    float totalSKS = 0, totalNilai = 0;
+    
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0) {
+            if (currentSemester != akademikData[i].semester) {
+                if (currentSemester != -1) {
+                    float semesterIP = totalNilai / totalSKS;
+                    printf("------------------------------------------------------------\n");
+                    printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
+                }
+                currentSemester = akademikData[i].semester;
+                totalSKS = 0;
+                totalNilai = 0;
+            }
+            
+            printf("Semester      : %d\n", akademikData[i].semester);
+            printf("Matakuliah    : %s\n", akademikData[i].matakuliah);
+            printf("Tahun Akademik: %s\n", akademikData[i].tahunAkademik);
+            printf("Nilai Tugas   : %.2f\n", akademikData[i].nilaiTugas);
+            printf("Nilai UTS     : %.2f\n", akademikData[i].nilaiUTS);
+            printf("Nilai UAS     : %.2f\n", akademikData[i].nilaiUAS);
+            
+            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
+            printf("Nilai rata-rata sebelum grade: %.2f (Grade: %c)\n", finalGrade, akademikData[i].grade);
+            
+            totalSKS += getSKS(akademikData[i].matakuliah);
+            totalNilai += (finalGrade * getSKS(akademikData[i].matakuliah));
+        }
+    }
+    
+    if (currentSemester != -1) {
+        float semesterIP = totalNilai / totalSKS;
+        printf("------------------------------------------------------------\n");
+        printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
+    }
+    
+    // Display IPK (Cumulative GPA)
+    float IPK = calculateIPK(NIM);
+    printf("------------------------------------------------------------\n");
+    printf("IPK: %.2f\n", IPK > 4.0 ? 4.0 : IPK);
+    printf("------------------------------------------------------------\n");
+}
 
 // Function to calculate IP (GPA for a semester)
 float calculateIP(const char NIM[], int semester) {
