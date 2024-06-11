@@ -495,6 +495,7 @@ void editNilaiAdmin() {
                 akademikData[i].nilaiTugas = nilaiTugas;
                 akademikData[i].nilaiUTS = nilaiUTS;
                 akademikData[i].nilaiUAS = nilaiUAS;
+                akademikData[akademikCount].grade = calculateGrade((nilaiTugas + nilaiUTS + nilaiUAS) / 3); // Calculate and set grade
                 printf("Nilai berhasil diupdate.\n");
                 return;
             }
