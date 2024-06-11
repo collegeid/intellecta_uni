@@ -15,6 +15,7 @@ int matakuliahCount = 0;
 //function untuk populate data
 void addAkademik(const char NIM[], int semester, const char matakuliah[], const char tahunAkademik[], float nilaiTugas, float nilaiUTS, float nilaiUAS);
 void addMatakuliah(const char matakuliah[], int sks);
+void populateSampleData();
 
 
 // Function prototypes
@@ -31,8 +32,6 @@ float calculateIPK(const char NIM[]);
 char calculateGrade(float finalGrade);
 float GradeToIP(const char grade);
 
-
-void populateSampleData();
 
 // Function to check if NIM is registered
 bool checkNIM(const char NIM[]) {
@@ -346,7 +345,7 @@ float calculateIPK(const char NIM[]) {
 
     for (int semester = 1; semester <= maxSemesters; semester++) {
         float semesterIP = calculateIP(NIM, semester);
-        if (semesterIP > 0) { // Only count semesters with valid IP
+        if (semesterIP >= 0) { // Only count semesters with valid IP
             totalIP += semesterIP;
             totalSemesters++;
         }
