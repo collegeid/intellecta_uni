@@ -15,6 +15,7 @@ int matakuliahCount = 0;
 //function untuk populate data
 void addAkademik(const char NIM[], int semester, const char matakuliah[], const char tahunAkademik[], float nilaiTugas, float nilaiUTS, float nilaiUAS);
 void addMatakuliah(const char matakuliah[], int sks);
+void populateSampleData();
 
 
 // Function prototypes
@@ -31,8 +32,6 @@ float calculateIPK(const char NIM[]);
 char calculateGrade(float finalGrade);
 float GradeToIP(const char grade);
 
-
-void populateSampleData();
 
 // Function to check if NIM is registered
 bool checkNIM(const char NIM[]) {
@@ -334,8 +333,6 @@ float calculateIP(const char NIM[], int semester) {
 
     return result;
 }
-// Function to calculate cumulative IPK (Cumulative GPA)
-
 
 
 // Function to calculate cumulative IPK (Cumulative GPA)
@@ -345,17 +342,29 @@ float calculateIPK(const char NIM[]) {
     int maxSemesters = 14; // Assuming a maximum of 14 semesters
 
     for (int semester = 1; semester <= maxSemesters; semester++) {
-        float semesterIP = calculateIP(NIM, semester);
-        if (semesterIP > 0) { // Only count semesters with valid IP
+       bool hasData = false;
+        for (int i = 0; i < akademikCount; i++) {
+            if (strcmp(akademikData[i].NIM, NIM) == 0 && akademikData[i].semester == semester) {
+                hasData = true;
+                break;
+            }
+        }
+        if (hasData) {
+            float semesterIP = calculateIP(NIM, semester);
             totalIP += semesterIP;
             totalSemesters++;
+            
+            // Print debug information
+            // printf("IP for NIM: %s, Semester: %d, IP: %.2f\n", NIM, semester, semesterIP);
+            // printf("Total IP so far: %.2f\n", totalIP);
+            // printf("Total semesters so far: %d\n", totalSemesters);
         }
     }
 
     if (totalSemesters == 0) return 0;
 
     float IPK = totalIP / totalSemesters;
-   // printf("Final IPK for NIM %s: %.2f\n", NIM, IPK);
+ //   printf("Final IPK for NIM %s: %.2f\n", NIM, IPK);
 
     return IPK;
 }
