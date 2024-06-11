@@ -10,13 +10,18 @@ int akunCount = 0;
 int akademikCount = 0;
 int matakuliahCount = 0;
 
-// Function prototypes
-bool checkNIM(const char NIM[]);
-bool checkLogin(const char NIM[], const char password[]);
-void addMahasiswa(const char NIM[], const char nama[], const char kelas[], const char email[], const char gender[], int semester);
-void addAkunMahasiswa(const char NIM[], const char password[]);
+
+
+//function untuk populate data
 void addAkademik(const char NIM[], int semester, const char matakuliah[], const char tahunAkademik[], float nilaiTugas, float nilaiUTS, float nilaiUAS);
 void addMatakuliah(const char matakuliah[], int sks);
+
+
+// Function prototypes
+void addMahasiswa(const char NIM[], const char nama[], const char kelas[], const char email[], const char gender[], int semester);
+void addAkunMahasiswa(const char NIM[], const char password[]);
+bool checkNIM(const char NIM[]);
+bool checkLogin(const char NIM[], const char password[]);
 void registerMahasiswa();
 void login();
 void checkProfile(const char NIM[]);
@@ -24,6 +29,9 @@ void displayAkademik(const char NIM[]);
 float calculateIP(const char NIM[], int semester);
 float calculateIPK(const char NIM[]);
 char calculateGrade(float finalGrade);
+float GradeToIP(const char grade);
+
+
 void populateSampleData();
 
 // Function to check if NIM is registered
@@ -238,112 +246,55 @@ void checkProfile(const char NIM[]) {
 }
 
 
-// Function to display academic records
+
+
 void displayAkademik(const char NIM[]) {
-    printf("Rekam Akademik:\n");
-    int currentSemester = -1;
-    float totalSKS = 0, totalNilai = 0;
-    for (int i = 0; i < akademikCount; i++) {
-        if (strcmp(akademikData[i].NIM, NIM) == 0) {
-            if (currentSemester != akademikData[i].semester) {
-                if (currentSemester != -1) {
-                    float semesterIP = totalNilai / totalSKS;
-                    printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
-                }
-                currentSemester = akademikData[i].semester;
-                totalSKS = 0;
-                totalNilai = 0;
-            }
-            printf("Semester: %d\n", akademikData[i].semester);
-            printf("Matakuliah: %s\n", akademikData[i].matakuliah);
-            printf("Tahun Akademik: %s\n", akademikData[i].tahunAkademik);
-            printf("Nilai Tugas: %.2f\n", akademikData[i].nilaiTugas);
-            printf("Nilai UTS: %.2f\n", akademikData[i].nilaiUTS);
-            printf("Nilai UAS: %.2f\n", akademikData[i].nilaiUAS);
-
-            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
-            printf("Nilai rata-rata sebelum grade: %.2f (Grade: %c)\n", finalGrade, akademikData[i].grade);
-
-            totalSKS += getSKS(akademikData[i].matakuliah);
-            totalNilai += (finalGrade * getSKS(akademikData[i].matakuliah));
-        }
-    }
-    if (currentSemester != -1) {
-        float semesterIP = totalNilai / totalSKS;
-        printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
-    }
-    // Display IPK (Cumulative GPA)
-    float IPK = calculateIPK(NIM);
-    printf("IPK: %.2f\n", IPK > 4.0 ? 4.0 : IPK);
-}
-
-// Function to display academic records
-void displayAkademik2(const char NIM[]) {
-    printf("------------------------------------------------------------\n");
-    printf("===================== Rekam Akademik =======================\n");
-    printf("------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------\n");
+    printf("======================================= Rekam Akademik =====================================\n");
+    printf("--------------------------------------------------------------------------------------------\n");
     
     int currentSemester = -1;
-    float totalSKS = 0, totalNilai = 0;
     
     for (int i = 0; i < akademikCount; i++) {
         if (strcmp(akademikData[i].NIM, NIM) == 0) {
             if (currentSemester != akademikData[i].semester) {
                 if (currentSemester != -1) {
-                    float semesterIP = totalNilai / totalSKS;
-                    printf("------------------------------------------------------------\n");
-                    printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
+                    float semesterIP = calculateIP(NIM, currentSemester);
+                    printf("--------------------------------------------------------------------------------------------\n");
+                    printf("===================================== IP Semester %d: %.2f ==================================\n", currentSemester, semesterIP);
+                    printf("--------------------------------------------------------------------------------------------\n");
                 }
                 currentSemester = akademikData[i].semester;
-                totalSKS = 0;
-                totalNilai = 0;
+                printf("========================================= Semester %d =======================================\n", currentSemester);
+                printf("--------------------------------------------------------------------------------------------\n");
+                printf("| %-30s | %-5s | %-15s | %-5s | %-5s | %-5s | %-5s |\n", "Matakuliah", "SKS", "Tahun Akademik", "Tugas", "UTS", "UAS", "Grade");
+                printf("--------------------------------------------------------------------------------------------\n");
             }
-            
-            printf("Semester      : %d\n", akademikData[i].semester);
-            printf("Matakuliah    : %s\n", akademikData[i].matakuliah);
-            printf("Tahun Akademik: %s\n", akademikData[i].tahunAkademik);
-            printf("Nilai Tugas   : %.2f\n", akademikData[i].nilaiTugas);
-            printf("Nilai UTS     : %.2f\n", akademikData[i].nilaiUTS);
-            printf("Nilai UAS     : %.2f\n", akademikData[i].nilaiUAS);
-            
-            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
-            printf("Nilai rata-rata sebelum grade: %.2f (Grade: %c)\n", finalGrade, akademikData[i].grade);
-            
-            totalSKS += getSKS(akademikData[i].matakuliah);
-            totalNilai += (finalGrade * getSKS(akademikData[i].matakuliah));
+
+            int sks = getSKS(akademikData[i].matakuliah);
+            printf("| %-30s | %-5d | %-15s | %-5.2f | %-5.2f | %-5.2f | %-5c |\n", akademikData[i].matakuliah, sks, akademikData[i].tahunAkademik, akademikData[i].nilaiTugas, akademikData[i].nilaiUTS, akademikData[i].nilaiUAS, akademikData[i].grade);
         }
     }
     
     if (currentSemester != -1) {
-        float semesterIP = totalNilai / totalSKS;
-        printf("------------------------------------------------------------\n");
-        printf("IP Semester %d: %.2f\n", currentSemester, semesterIP > 4.0 ? 4.0 : semesterIP);
+        float semesterIP = calculateIP(NIM, currentSemester);
+        printf("--------------------------------------------------------------------------------------------\n");
+        printf("===================================== IP Semester %d: %.2f ==================================\n", currentSemester, semesterIP);
+        printf("--------------------------------------------------------------------------------------------\n");
     }
     
     // Display IPK (Cumulative GPA)
     float IPK = calculateIPK(NIM);
-    printf("------------------------------------------------------------\n");
-    printf("IPK: %.2f\n", IPK > 4.0 ? 4.0 : IPK);
-    printf("------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------------\n");
+    printf("========================================== IPK: %.2f =======================================\n", IPK);
+    printf("--------------------------------------------------------------------------------------------\n");
 }
 
-// Function to calculate IP (GPA for a semester)
-float calculateIP(const char NIM[], int semester) {
-    int totalSKS = 0;
-    float totalNilai = 0;
-    for (int i = 0; i < akademikCount; i++) {
-        if (strcmp(akademikData[i].NIM, NIM) == 0 && akademikData[i].semester == semester) {
-            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
-            totalNilai += finalGrade * getSKS(akademikData[i].matakuliah);
-            totalSKS += getSKS(akademikData[i].matakuliah);
-        }
-    }
-    if (totalSKS == 0) return 0;
-    return totalNilai / totalSKS;
-}
+
+
 
 // Function to calculate IPK (Cumulative GPA)
-float calculateIPK(const char NIM[]) {
+float calculateIPK2(const char NIM[]) {
     int totalSKS = 0;
     float totalNilai = 0;
     for (int i = 0; i < akademikCount; i++) {
@@ -356,6 +307,60 @@ float calculateIPK(const char NIM[]) {
     if (totalSKS == 0) return 0;
     return totalNilai / totalSKS;
 }
+
+// Function to calculate IP (GPA) for a given semester
+float calculateIP(const char NIM[], int semester) {
+    float totalSKS = 0;
+    float totalNilai = 0;
+
+   // printf("Calculating IP for NIM: %s, Semester: %d\n", NIM, semester);
+
+    for (int i = 0; i < akademikCount; i++) {
+        if (strcmp(akademikData[i].NIM, NIM) == 0 && akademikData[i].semester == semester) {
+            int sks = getSKS(akademikData[i].matakuliah);
+            float gradePoint = GradeToIP(akademikData[i].grade);
+            totalSKS += sks;
+            totalNilai += (gradePoint * sks);
+
+         //   printf("Course: %s, SKS: %d, Grade: %c, Grade Point: %.2f\n", akademikData[i].matakuliah, sks, akademikData[i].grade, gradePoint);
+          //  printf("Current Total SKS: %.2f, Current Total Nilai: %.2f\n", totalSKS, totalNilai);
+        }
+    }
+
+    if (totalSKS == 0) return 0;
+
+    float result = totalNilai / totalSKS;
+    // printf("Final Total SKS: %.2f, Final Total Nilai: %.2f, IP: %.2f\n", totalSKS, totalNilai, result);
+
+    return result;
+}
+// Function to calculate cumulative IPK (Cumulative GPA)
+
+
+
+// Function to calculate cumulative IPK (Cumulative GPA)
+float calculateIPK(const char NIM[]) {
+    float totalIP = 0; // Total IP for all semesters
+    int totalSemesters = 0; // Total number of semesters
+    int maxSemesters = 14; // Assuming a maximum of 14 semesters
+
+    for (int semester = 1; semester <= maxSemesters; semester++) {
+        float semesterIP = calculateIP(NIM, semester);
+        if (semesterIP > 0) { // Only count semesters with valid IP
+            totalIP += semesterIP;
+            totalSemesters++;
+        }
+    }
+
+    if (totalSemesters == 0) return 0;
+
+    float IPK = totalIP / totalSemesters;
+   // printf("Final IPK for NIM %s: %.2f\n", NIM, IPK);
+
+    return IPK;
+}
+
+
 
 // Function to calculate grade based on final grade
 char calculateGrade(float finalGrade) {
@@ -365,6 +370,16 @@ char calculateGrade(float finalGrade) {
     if (finalGrade >= 40) return 'D';
     return 'E';
 }
+
+// Function to calculate grade based on final grade
+float GradeToIP(char Grade) {
+   if (Grade == 'A') return 4.00;
+   if (Grade == 'B') return 3.00; 
+   if (Grade == 'C') return 2.00; 
+   if (Grade == 'D') return 1.00;
+    return 0.00;
+}
+
 
 // Function to get SKS of a course
 int getSKS(const char matakuliah[]) {
@@ -392,6 +407,10 @@ void populateSampleData() {
     addAkademik("2350081084", 1, "Mathematics", "2023/2024", 80, 75, 85);
     addAkademik("2350081084", 1, "Physics", "2023/2024", 70, 65, 75);
     addAkademik("2350081084", 2, "Mathematics", "2023/2024", 90, 85, 95);
+
+
+
+    
 }
 
 int main_mahasiswa() {
