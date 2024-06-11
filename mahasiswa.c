@@ -337,6 +337,7 @@ float calculateIP(const char NIM[], int semester) {
 
 
 
+
 // Function to calculate cumulative IPK (Cumulative GPA)
 float calculateIPK(const char NIM[]) {
     float totalIP = 0; // Total IP for all semesters
@@ -345,16 +346,14 @@ float calculateIPK(const char NIM[]) {
 
     for (int semester = 1; semester <= maxSemesters; semester++) {
         float semesterIP = calculateIP(NIM, semester);
-        if (semesterIP >= 0) { // Only count semesters with valid IP
-            totalIP += semesterIP;
-            totalSemesters++;
-        }
+        totalIP += semesterIP;
+        totalSemesters++; // Increment semester count regardless of IP value
     }
 
     if (totalSemesters == 0) return 0;
 
     float IPK = totalIP / totalSemesters;
-   // printf("Final IPK for NIM %s: %.2f\n", NIM, IPK);
+    printf("Final IPK for NIM %s: %.2f\n", NIM, IPK);
 
     return IPK;
 }
