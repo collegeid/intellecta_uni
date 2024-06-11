@@ -292,21 +292,6 @@ void displayAkademik(const char NIM[]) {
 
 
 
-// Function to calculate IPK (Cumulative GPA)
-float calculateIPK2(const char NIM[]) {
-    int totalSKS = 0;
-    float totalNilai = 0;
-    for (int i = 0; i < akademikCount; i++) {
-        if (strcmp(akademikData[i].NIM, NIM) == 0) {
-            float finalGrade = (akademikData[i].nilaiTugas + akademikData[i].nilaiUTS + akademikData[i].nilaiUAS) / 3;
-            totalSKS += getSKS(akademikData[i].matakuliah);
-            totalNilai += finalGrade * getSKS(akademikData[i].matakuliah);
-        }
-    }
-    if (totalSKS == 0) return 0;
-    return totalNilai / totalSKS;
-}
-
 // Function to calculate IP (GPA) for a given semester
 float calculateIP(const char NIM[], int semester) {
     float totalSKS = 0;
